@@ -8,6 +8,10 @@ def texto(value):
 
 
 def run(data):
+    if not isinstance(data, dict):
+        raise ValueError("A entrada deve ser um objeto JSON.")
+    if not isinstance(data["pontos"], list) or any(not isinstance(item, dict) for item in data["pontos"]):
+        raise ValueError("O campo pontos deve ser uma lista de objetos.")
     pontos = data["pontos"]
     if not isinstance(pontos, list) or not pontos:
         raise ValueError("Inclua pelo menos um ponto no esboço.")
@@ -46,3 +50,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
