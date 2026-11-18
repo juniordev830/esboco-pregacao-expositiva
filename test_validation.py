@@ -24,6 +24,15 @@ class InputValidationTest(unittest.TestCase):
         run(self.data)
         self.assertEqual(self.data, original)
 
+    def test_titulos_copiados_em_varias_linhas_continuam_cabecalhos(self):
+        self.data["titulo"] = "Salmo 23\r\n O cuidado do Pastor"
+        self.data["pontos"][0]["titulo"] = "Deus guia\n\n o seu povo"
+        self.data["pontos"][0]["explicacao"] = "Primeiro parágrafo.\n\nSegundo parágrafo."
+        markdown = run(self.data)["esboco_markdown"]
+        self.assertTrue(markdown.startswith("# Salmo 23 O cuidado do Pastor\n"))
+        self.assertIn("\n## 1. Deus guia o seu povo\n", markdown)
+        self.assertIn("Primeiro parágrafo.\n\nSegundo parágrafo.", markdown)
+
     def test_invalid_json_cli(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "invalid.json"
