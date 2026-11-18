@@ -7,19 +7,23 @@ def texto(value):
     return value.strip()
 
 
+def titulo_markdown(value):
+    return " ".join(parte.strip() for parte in texto(value).splitlines() if parte.strip())
+
+
 def run(data):
     if not isinstance(data, dict):
         raise ValueError("A entrada deve ser um objeto JSON.")
     if not isinstance(data["pontos"], list) or any(not isinstance(item, dict) for item in data["pontos"]):
         raise ValueError("O campo pontos deve ser uma lista de objetos.")
     pontos = data["pontos"]
-    if not isinstance(pontos, list) or not pontos:
+    if not pontos:
         raise ValueError("Inclua pelo menos um ponto no esboço.")
-    secoes = [f"# {texto(data['titulo'])}",
+    secoes = [f"# {titulo_markdown(data['titulo'])}",
               f"**Texto-base** — {texto(data['texto_base'])}",
               f"**Ideia central** — {texto(data['ideia_central'])}"]
     for ordem, ponto in enumerate(pontos, 1):
-        secoes.append(f"## {ordem}. {texto(ponto['titulo'])}")
+        secoes.append(f"## {ordem}. {titulo_markdown(ponto['titulo'])}")
         secoes.append(f"{texto(ponto['referencia'])} — {texto(ponto['explicacao'])}")
         secoes.append(f"**Aplicação** — {texto(ponto['aplicacao'])}")
     secoes.extend(["## Conclusão", texto(data["conclusao"])])
