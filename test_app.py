@@ -74,3 +74,36 @@ class JsonEstritoCliTest(unittest.TestCase):
         self.assertEqual(resultado.returncode, 2)
         self.assertIn("Campo JSON repetido", resultado.stderr)
         self.assertEqual(resultado.stdout, "")
+
+
+class PlanejamentoTempoTest(unittest.TestCase):
+    def dados(self, **extras):
+        return dict(titulo="Tema", texto_base="João 15", ideia_central="Ideia",
+                    conclusao="Conclusão",
+                    pontos=[dict(titulo="Ponto", referencia="João 15:1",
+                                 explicacao="Explicação", aplicacao="Aplicação", minutos=15)],
+                    **extras)
+
+    def test_distribui_tempo(self):
+        result = run(self.dados(tempo_total=30, tempo_abertura=5, tempo_conclusao=5))
+        self.assertEqual(result["planejamento_tempo"], {
+            "total": 30, "abertura": 5, "conclusao": 5,
+            "pontos": [{"ponto": 1, "inicio": 5, "fim": 20}],
+            "minutos_livres": 5})
+
+    def test_rejeita_excesso(self):
+        with self.assertRaises(ValueError):
+            run(self.dados(tempo_total=10))
+
+    def test_rejeita_booleano(self):
+        with self.assertRaises(ValueError):
+            run(self.dados(tempo_total=True))
+
+    def test_opcional(self):
+        self.assertNotIn("planejamento_tempo", run(self.dados()))
+
+    def test_rejeita_ponto_sem_duracao(self):
+        dados = self.dados(tempo_total=30)
+        del dados["pontos"][0]["minutos"]
+        with self.assertRaises(ValueError):
+            run(dados)
