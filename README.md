@@ -28,3 +28,8 @@ Também é possível encadear a ferramenta com outro comando usando `-` como ent
 ```bash
 cat exemplo.json | python app.py -
 ```
+
+
+## Novo recurso
+
+Informe opcionalmente `minutos_disponiveis`, `minutos_introducao`, `minutos_conclusao` e `minutos` em cada ponto. O gerador valida o orçamento de tempo e inclui a duração no Markdown e no JSON.
