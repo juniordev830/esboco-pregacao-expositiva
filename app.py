@@ -19,15 +19,36 @@ def run(data):
     pontos = data["pontos"]
     if not pontos:
         raise ValueError("Inclua pelo menos um ponto no esboço.")
+    tempos = None
+    if "minutos_disponiveis" in data:
+        limite = data["minutos_disponiveis"]
+        if type(limite) is not int or not 1 <= limite <= 1440:
+            raise ValueError("minutos_disponiveis deve ser inteiro de 1 a 1440.")
+        tempos = [ponto.get("minutos") for ponto in pontos]
+        if any(type(t) is not int or t < 1 for t in tempos):
+            raise ValueError("Cada ponto deve informar minutos inteiros positivos.")
+        introducao = data.get("minutos_introducao", 0)
+        conclusao = data.get("minutos_conclusao", 0)
+        if any(type(t) is not int or t < 0 for t in (introducao, conclusao)):
+            raise ValueError("Introdução e conclusão exigem minutos inteiros não negativos.")
+        total = sum(tempos) + introducao + conclusao
+        if total > limite:
+            raise ValueError("O esboço excede o tempo disponível.")
     secoes = [f"# {titulo_markdown(data['titulo'])}",
               f"**Texto-base** — {texto(data['texto_base'])}",
               f"**Ideia central** — {texto(data['ideia_central'])}"]
     for ordem, ponto in enumerate(pontos, 1):
         secoes.append(f"## {ordem}. {titulo_markdown(ponto['titulo'])}")
+        if tempos is not None:
+            secoes.append(f"**Tempo previsto:** {tempos[ordem - 1]} min")
         secoes.append(f"{texto(ponto['referencia'])} — {texto(ponto['explicacao'])}")
         secoes.append(f"**Aplicação** — {texto(ponto['aplicacao'])}")
     secoes.extend(["## Conclusão", texto(data["conclusao"])])
-    return {"esboco_markdown": "\n\n".join(secoes), "quantidade_de_pontos": len(pontos)}
+    resultado = {"esboco_markdown": "\n\n".join(secoes), "quantidade_de_pontos": len(pontos)}
+    if tempos is not None:
+        resultado["tempo"] = {"introducao": introducao, "pontos": tempos,
+                              "conclusao": conclusao, "total": total, "livres": limite - total}
+    return resultado
 
 
 import argparse
