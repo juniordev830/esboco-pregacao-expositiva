@@ -11,6 +11,29 @@ def titulo_markdown(value):
     return " ".join(parte.strip() for parte in texto(value).splitlines() if parte.strip())
 
 
+def minutos(value, nome, minimo=0):
+    if type(value) is not int or value < minimo:
+        raise ValueError(f"{nome} deve ser um inteiro a partir de {minimo}.")
+    return value
+
+
+def planejar_tempo(data, pontos):
+    total = minutos(data["tempo_total"], "tempo_total", 1)
+    abertura = minutos(data.get("tempo_abertura", 0), "tempo_abertura")
+    conclusao = minutos(data.get("tempo_conclusao", 0), "tempo_conclusao")
+    agenda = []
+    atual = abertura
+    for ordem, ponto in enumerate(pontos, 1):
+        duracao = minutos(ponto.get("minutos"), f"minutos do ponto {ordem}", 1)
+        agenda.append({"ponto": ordem, "inicio": atual, "fim": atual + duracao})
+        atual += duracao
+    usado = atual + conclusao
+    if usado > total:
+        raise ValueError("O esboço excede o tempo total da pregação.")
+    return {"total": total, "abertura": abertura, "conclusao": conclusao,
+            "pontos": agenda, "minutos_livres": total - usado}
+
+
 def run(data):
     if not isinstance(data, dict):
         raise ValueError("A entrada deve ser um objeto JSON.")
@@ -27,7 +50,10 @@ def run(data):
         secoes.append(f"{texto(ponto['referencia'])} — {texto(ponto['explicacao'])}")
         secoes.append(f"**Aplicação** — {texto(ponto['aplicacao'])}")
     secoes.extend(["## Conclusão", texto(data["conclusao"])])
-    return {"esboco_markdown": "\n\n".join(secoes), "quantidade_de_pontos": len(pontos)}
+    resultado = {"esboco_markdown": "\n\n".join(secoes), "quantidade_de_pontos": len(pontos)}
+    if "tempo_total" in data:
+        resultado["planejamento_tempo"] = planejar_tempo(data, pontos)
+    return resultado
 
 
 import argparse
