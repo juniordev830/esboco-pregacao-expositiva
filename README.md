@@ -28,3 +28,14 @@ Também é possível encadear a ferramenta com outro comando usando `-` como ent
 ```bash
 cat exemplo.json | python app.py -
 ```
+
+
+## Planejamento do tempo de pregação
+
+Opcionalmente, informe `tempo_total` (minutos inteiros positivos),
+`tempo_abertura` e `tempo_conclusao` (inteiros não negativos, padrão 0).
+Cada ponto deve ter a propriedade `minutos` (inteiro positivo).
+O JSON de saída inclui `planejamento_tempo` com início e fim relativos de
+cada ponto e minutos livres. Se o orçamento for excedido, a CLI retorna
+erro. Sem `tempo_total`, o comportamento anterior é preservado.
+A exportação Markdown continua contendo apenas o esboço.
