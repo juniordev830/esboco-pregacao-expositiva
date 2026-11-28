@@ -1,5 +1,7 @@
 # Esboço de pregação expositiva
 
+**Navegação** · [Rodar](#rodar) · [Uso](#uso) · [Fontes e exemplos](#fontes-e-exemplos) · [Código e estudo](docs/ENGENHARIA_REVERSA.md)
+
 Gere um esboço em Markdown com ideia central, evidência bíblica e aplicação para cada ponto.
 
 ## Rodar
@@ -28,3 +30,9 @@ Também é possível encadear a ferramenta com outro comando usando `-` como ent
 ```bash
 cat exemplo.json | python app.py -
 ```
+
+## Código e roteiro de estudo
+
+Que validação preserva a relação entre um ponto, seu fundamento bíblico e a aplicação? O [guia de engenharia reversa](docs/ENGENHARIA_REVERSA.md) reúne o mapa dos módulos e uma pergunta técnica baseada no projeto.
+
+Mantido por [João Junior](https://github.com/juniordev830).
